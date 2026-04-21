@@ -13,9 +13,9 @@
     <aside class="sidebar">
       <h2>Conteúdo</h2>
       <ul>
-        <li><a href="pages/introducao.html">Introdução</a></li>
-        <li><a href="pages/html.html">HTML</a></li>
-        <li><a href="pages/css.html">CSS</a></li>
+        <li><a href="pages/introducao.html" data-page="pages/introducao.html">Introdução</a></li>
+        <li><a href="pages/html.html" data-page="pages/html.html">HTML</a></li>
+        <li><a href="pages/css.html" data-page="pages/css.html">CSS</a></li>
       </ul>
     </aside>
 
@@ -34,6 +34,33 @@
     </main>
 
   </div>
+
+  <script>
+    const content = document.querySelector('.content');
+    const links = document.querySelectorAll('.sidebar a[data-page]');
+
+    async function loadPage(url) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Falha ao carregar ' + url);
+        const htmlText = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, 'text/html');
+        const pageContent = doc.querySelector('main.content') || doc.body;
+        content.innerHTML = pageContent.innerHTML;
+      } catch (error) {
+        content.innerHTML = '<p>Erro ao carregar o conteúdo. Tente novamente.</p>';
+        console.error(error);
+      }
+    }
+
+    links.forEach(link => {
+      link.addEventListener('click', event => {
+        event.preventDefault();
+        loadPage(link.dataset.page);
+      });
+    });
+  </script>
 
 </body>
 </html>
